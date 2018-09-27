@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+    <meta http-equiv="Cache-Control" content="no-cache" />
+    <title>办公管理系统</title>
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <style type="text/css">
+        body {
+            background: url(asset/img/page.jpg);
+            background-position: center center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-size: cover;
+            text-align: center;
+        }
+
+        #logindiv {
+            height: 300px;
+            width: 480px;
+            background-image: url(asset/img/login.jpg);
+            color: white;
+            margin: 2% auto;
+        }
+
+        #sysname {
+            text-align: center;
+            color: #07ffc6;
+            font-size: 30px;
+            font-family: '黑体';
+            margin-top: 12%;
+        }
+
+        .myInput {
+            width: 480px;
+            position: absolute;
+            margin-top: 3%
+        }
+
+        #userAccount {
+            margin: 4% auto;
+        }
+
+        #userPassword {
+            margin: 2% auto;
+        }
+
+        #btnLogin {
+            margin: 5% auto;
+            display: block;
+        }
+
+        /*解决浏览器记住账号密码以后，输入框变黄的问题。*/
+        input:-webkit-autofill,
+        textarea:-webkit-autofill,
+        select:-webkit-autofill {
+            -webkit-box-shadow: 0 0 0 1000px white inset;
+        }
+        input[type=text]:focus, input[type=password]:focus, textarea:focus {
+            -webkit-box-shadow: 0 0 0 1000px white inset;
+        }
+
+    </style>
+</head>
+
+<body>
+<div id="sysname">
+    办公管理系统
+</div>
+<div id="logindiv" class="well">
+    <div class="myInput">
+        <input type="text" class="form-control col-sm-6" id="userAccount" placeholder="请输入账号" >
+        <input type="password" class="form-control col-sm-6" id="userPassword" placeholder="请输入密码">
+        <button type="button" id="btnLogin" class="btn btn-primary col-sm-6">登录</button>
+    </div>
+</div>
+
+<!-- jQuery -->
+<script src="asset/jquery/jquery-3.2.1.min.js"></script>
+<link href="asset/bootstrap/css/bootstrap4.min.css" rel="stylesheet"/>
+<link href="asset/jquery-confirm/css/jquery-confirm.min.css" rel="stylesheet"/>
+<script src="asset/jquery-confirm/js/jquery-confirm.min.js"></script>
+
+<script type="text/javascript">
+    $(document).keydown(function (e) {
+        if (e.keyCode == 13) {
+            doLogin();
+        }
+    });
+
+    $("#btnLogin").click(function () {
+        doLogin();
+    });
+
+    function doLogin() {
+         var userAccount = $("#userAccount").val();
+         var userPassword = $("#userPassword").val();
+         if (userAccount == ""){
+            $.alert('账号不能为空!！');
+            $("#userAccount").focus();
+            return;
+         }
+         if (userPassword == ""){
+            $.alert('密码不能为空!！');
+            $("#userPassword").focus();
+            return;
+         }
+         $.ajax({
+             type: 'post',
+             cache: false,
+             dataType: 'json',
+             url: 'doLogin',
+             data: {"userAccount": userAccount,"userPassword":userPassword },
+             success: function(result){
+                 if (result.status=='000'){
+                     $("#txtUsername").val("");
+                     $("#txtPassword").val("");
+                     location.href = 'index.html';
+                 }else{
+                     $.alert('登陆失败,账号或密码有误!');
+                     $("#txtUsername").focus();
+                     $("#txtPassword").val("");
+                     console.log(result.message);
+                 }
+            } ,
+            error: function(){
+                $.alert('发送系统错误,请与系统管理员联系!');
+            }
+         });
+    }
+    $("#userAccount").focus();
+</script>
+
+</body>
+</html>

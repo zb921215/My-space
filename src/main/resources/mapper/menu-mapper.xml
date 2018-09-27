@@ -1,0 +1,314 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    
+<mapper namespace="com.company.repository.MenuMapper">
+
+	<resultMap id="menu_result_map" type="com.company.entity.Menu" >
+		<id column="menu_id" property="menuId" jdbcType="INTEGER"/>
+		<result column="menu_pid" property="menuPid" jdbcType="INTEGER"/>
+		<result column="menu_name" property="menuName" jdbcType="VARCHAR"/>
+		<result column="menu_url" property="menuUrl" jdbcType="VARCHAR"/>
+		<result column="menu_icon" property="menuIcon" jdbcType="VARCHAR"/>
+		<result column="menu_order" property="menuOrder" jdbcType="INTEGER"/>
+		<result column="create_by" property="createBy" jdbcType="INTEGER"/>
+		<result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+		<result column="update_by" property="updateBy" jdbcType="INTEGER"/>
+		<result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+	</resultMap>
+	
+	<insert id="insertByEntity">
+		insert into t_menu
+		<trim prefix="(" suffix=")" suffixOverrides="," >
+      		<if test="menuId!=null and menuId!=''">
+				menu_id,
+			</if>
+      		<if test="menuPid!=null and menuPid!=''">
+				menu_pid,
+			</if>
+      		<if test="menuName!=null and menuName!=''">
+				menu_name,
+			</if>
+      		<if test="menuUrl!=null and menuUrl!=''">
+				menu_url,
+			</if>
+      		<if test="menuIcon!=null and menuIcon!=''">
+				menu_icon,
+			</if>
+      		<if test="menuOrder!=null and menuOrder!=''">
+				menu_order,
+			</if>
+      		<if test="createBy!=null and createBy!=''">
+				create_by,
+			</if>
+      		<if test="createTime!=null and createTime!=''">
+				create_time,
+			</if>
+      		<if test="updateBy!=null and updateBy!=''">
+				update_by,
+			</if>
+      		<if test="updateTime!=null and updateTime!=''">
+				update_time,
+			</if>
+    	</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides="," >
+      		<if test="menuId!=null and menuId!=''">
+      			#{menuId,jdbcType=INTEGER},
+			</if>
+      		<if test="menuPid!=null and menuPid!=''">
+      			#{menuPid,jdbcType=INTEGER},
+			</if>
+      		<if test="menuName!=null and menuName!=''">
+      			#{menuName,jdbcType=VARCHAR},
+			</if>
+      		<if test="menuUrl!=null and menuUrl!=''">
+      			#{menuUrl,jdbcType=VARCHAR},
+			</if>
+      		<if test="menuIcon!=null and menuIcon!=''">
+      			#{menuIcon,jdbcType=VARCHAR},
+			</if>
+      		<if test="menuOrder!=null and menuOrder!=''">
+      			#{menuOrder,jdbcType=INTEGER},
+			</if>
+      		<if test="createBy!=null and createBy!=''">
+      			#{createBy,jdbcType=INTEGER},
+			</if>
+      		<if test="createTime!=null and createTime!=''">
+      			#{createTime,jdbcType=TIMESTAMP},
+			</if>
+      		<if test="updateBy!=null and updateBy!=''">
+      			#{updateBy,jdbcType=INTEGER},
+			</if>
+      		<if test="updateTime!=null and updateTime!=''">
+      			#{updateTime,jdbcType=TIMESTAMP},
+			</if>
+    	</trim>
+	</insert>
+
+	<delete id="delete">
+		delete from t_menu
+		<where>
+			AND menu_id IN
+			<foreach collection="ids" index="index" item="menuId" open="("
+					 separator="," close=")">
+				#{menuId,jdbcType=INTEGER}
+			</foreach>
+		</where>
+	</delete>
+
+	<update id="updateByEntity">
+		update t_menu
+		<set>
+			<if test="menuPid!=null and menuPid!=''">
+				menu_pid=#{menuPid},
+			</if>
+			<if test="menuName!=null and menuName!=''">
+				menu_name=#{menuName},
+			</if>
+			<if test="menuUrl!=null and menuUrl!=''">
+				menu_url=#{menuUrl},
+			</if>
+			<if test="menuIcon!=null and menuIcon!=''">
+				menu_icon=#{menuIcon},
+			</if>
+			<if test="menuOrder!=null and menuOrder!=''">
+				menu_order=#{menuOrder},
+			</if>
+			<if test="createBy!=null and createBy!=''">
+				create_by=#{createBy,jdbcType=INTEGER},
+			</if>
+			<if test="createTime!=null and createTime!=''">
+				create_time=#{createTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="updateBy!=null and updateBy!=''">
+				update_by=#{updateBy,jdbcType=INTEGER},
+			</if>
+			<if test="updateTime!=null and updateTime!=''">
+				update_time=#{updateTime,jdbcType=TIMESTAMP},
+			</if>
+		</set>
+		<where>
+			<if test="menuId!=null and menuId!=''">
+				and menu_id=#{menuId,jdbcType=INTEGER}
+			</if>
+		</where>
+	</update>
+
+	<select id="selectSingle"  resultMap="menu_result_map">
+		select menu_id,menu_pid,menu_name,menu_url,menu_icon,menu_order,create_by,create_time,update_by,update_time from t_menu
+		<where>
+			<if test="menuId!=null ">
+				and menu_id=#{menuId,jdbcType=INTEGER}
+			</if>
+		</where>
+	</select>
+
+	<select id="queryByObject" resultType="hashMap" >
+		SELECT menu_id,menu_pid,(SELECT menu_name FROM t_menu t2 WHERE t2.menu_id = t1.menu_pid) AS parentMenuName,menu_name,menu_url,menu_icon,menu_order,(select user_name from t_user where user_id = t_user.create_by) AS createName,create_time,update_by,update_time FROM t_menu t1
+		<where>
+			<if test="menuId!=null and menuId!=''">
+				and menu_id = #{menuId,jdbcType=INTEGER}
+			</if>
+			<if test="menuPid!=null and menuPid!=''">
+				and menu_pid = #{menuPid,jdbcType=INTEGER}
+			</if>
+			<if test="menuName!=null and menuName!=''">
+				and menu_name = #{menuName,jdbcType=VARCHAR}
+			</if>
+			<if test="menuUrl!=null and menuUrl!=''">
+				and menu_url = #{menuUrl,jdbcType=VARCHAR}
+			</if>
+			<if test="menuIcon!=null and menuIcon!=''">
+				and menu_icon = #{menuIcon,jdbcType=VARCHAR}
+			</if>
+			<if test="menuOrder!=null and menuOrder!=''">
+				and menu_order = #{menuOrder,jdbcType=INTEGER}
+			</if>
+			<if test="createBy!=null and createBy!=''">
+				and create_by = #{createBy,jdbcType=INTEGER}
+			</if>
+			<if test="createTimeBegin!=null and createTimeBegin!=''">
+				and create_time <![CDATA[ >= ]]> str_to_date(#{createTimeBegin},  '%Y-%m-%d %H:%i:%s')
+			</if>
+			<if test="createTimeEnd!=null and createTimeEnd!=''">
+				and create_time <![CDATA[ <= ]]> str_to_date(#{createTimeEnd},  '%Y-%m-%d %H:%i:%s')
+			</if>
+			<if test="updateBy!=null and updateBy!=''">
+				and update_by = #{updateBy,jdbcType=INTEGER}
+			</if>
+			<if test="updateTimeBegin!=null and updateTimeBegin!=''">
+				and update_time <![CDATA[ >= ]]> str_to_date(#{updateTimeBegin},  '%Y-%m-%d %H:%i:%s')
+			</if>
+			<if test="updateTimeEnd!=null and updateTimeEnd!=''">
+				and update_time <![CDATA[ <= ]]> str_to_date(#{updateTimeEnd},  '%Y-%m-%d %H:%i:%s')
+			</if>
+		</where>
+			<if test="sortName!=null and sortName!=''">
+				ORDER BY ${sortName} ${sortOrder}
+			</if>
+	</select>
+
+	<select id="findPMenuByRoleId" resultMap="menu_result_map">
+		SELECT t_menu.menu_id,menu_pid,menu_name,menu_url,menu_icon,menu_order,t_menu.create_by,t_menu.create_time,t_menu.update_by,t_menu.update_time FROM t_menu
+		JOIN t_permission ON t_permission.menu_id = t_menu.menu_id
+		AND menu_pid is null
+		WHERE role_id = #{roleId}
+		AND locate('1',permission_value)>0
+	</select>
+
+	<select id="findCMenuByRoleId" resultMap="menu_result_map">
+		SELECT t_menu.menu_id,menu_pid,menu_name,menu_url,menu_icon,menu_order,t_menu.create_by,t_menu.create_time,t_menu.update_by,t_menu.update_time FROM t_menu
+		JOIN t_permission ON t_permission.menu_id = t_menu.menu_id
+		WHERE menu_pid = #{menuPid}
+		AND role_id = #{roleId}
+		AND locate('1',permission_value)>0
+	</select>
+
+	<select id="selectByObject" resultMap="menu_result_map">
+		SELECT menu_id,menu_pid,menu_name,menu_url,menu_icon,menu_order,create_by,create_time,update_by,update_time FROM t_menu
+		<where>
+			<if test="menuId!=null and menuId!=''">
+				and menu_id = #{menuId,jdbcType=INTEGER}
+			</if>
+			<if test="menuPid!=null and menuPid!=''">
+				and menu_pid = #{menuPid,jdbcType=INTEGER}
+			</if>
+			<if test="menuName!=null and menuName!=''">
+				and menu_name = #{menuName,jdbcType=VARCHAR}
+			</if>
+			<if test="menuUrl!=null and menuUrl!=''">
+				and menu_url = #{menuUrl,jdbcType=VARCHAR}
+			</if>
+			<if test="menuIcon!=null and menuIcon!=''">
+				and menu_icon = #{menuIcon,jdbcType=VARCHAR}
+			</if>
+			<if test="menuOrder!=null and menuOrder!=''">
+				and menu_order = #{menuOrder,jdbcType=INTEGER}
+			</if>
+			<if test="createBy!=null and createBy!=''">
+				and create_by = #{createBy,jdbcType=INTEGER}
+			</if>
+			<if test="createTimeBegin!=null and createTimeBegin!=''">
+				and create_time <![CDATA[ >= ]]> str_to_date(#{createTimeBegin},  '%Y-%m-%d %H:%i:%s')
+			</if>
+			<if test="createTimeEnd!=null and createTimeEnd!=''">
+				and create_time <![CDATA[ <= ]]> str_to_date(#{createTimeEnd},  '%Y-%m-%d %H:%i:%s')
+			</if>
+			<if test="updateBy!=null and updateBy!=''">
+				and update_by = #{updateBy,jdbcType=INTEGER}
+			</if>
+			<if test="updateTimeBegin!=null and updateTimeBegin!=''">
+				and update_time <![CDATA[ >= ]]> str_to_date(#{updateTimeBegin},  '%Y-%m-%d %H:%i:%s')
+			</if>
+			<if test="updateTimeEnd!=null and updateTimeEnd!=''">
+				and update_time <![CDATA[ <= ]]> str_to_date(#{updateTimeEnd},  '%Y-%m-%d %H:%i:%s')
+			</if>
+			ORDER BY menu_order
+		</where>
+	</select>
+
+	<select id="selectData" resultType="hashMap" >
+		SELECT menu_id,menu_pid,menu_name,menu_url,menu_icon,menu_order,create_by,create_time,update_by,update_time FROM t_menu
+		<where>
+			<if test="menuName!=null and menuName!=''">
+				and menu_name = #{menuName}
+			</if>
+			<if test="menuId!=null and menuId!=''">
+				and menu_id != #{menuId}
+			</if>
+		</where>
+	</select>
+
+
+	<select id="getMaxOrder" resultType="Integer" >
+		SELECT max(menu_order) FROM t_menu
+		<choose>
+			<when test="menuPid!=null and menuPid!=''">
+				WHERE menu_pid = #{menuPid}
+			</when>
+			<otherwise>
+				WHERE menu_pid IS NULL
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="selectOrderByMenuPid" resultType="hashMap" >
+		SELECT menu_order FROM t_menu
+		<choose>
+			<when test="menuPid!=null and menuPid!=''">
+				WHERE menu_pid = #{menuPid}
+			</when>
+			<otherwise>
+				WHERE menu_pid IS NULL
+			</otherwise>
+		</choose>
+		ORDER BY menu_order
+	</select>
+
+	<select id="findMenuByOrder" resultMap="menu_result_map" >
+		SELECT menu_id,menu_order FROM t_menu
+		<choose>
+			<when test="menuPid!=null and menuPid!=''">
+				WHERE menu_pid = #{menuPid}
+			</when>
+			<otherwise>
+				WHERE menu_pid IS NULL
+			</otherwise>
+		</choose>
+		AND menu_order >= #{menuOrder}
+	</select>
+
+	<select id="getMenuByOrder" resultMap="menu_result_map" >
+		SELECT menu_id,menu_order FROM t_menu
+		<choose>
+			<when test="menuPid!=null and menuPid!=''">
+				WHERE menu_pid = #{menuPid}
+			</when>
+			<otherwise>
+				WHERE menu_pid IS NULL
+			</otherwise>
+		</choose>
+		AND menu_order = #{menuOrder}
+	</select>
+
+</mapper>

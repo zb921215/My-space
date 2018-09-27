@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    
+<mapper namespace="com.company.repository.UserMapper">
+
+	<resultMap id="user_result_map" type="com.company.entity.User" >
+		<id column="user_id" property="userId" jdbcType="INTEGER"/>
+		<result column="user_account" property="userAccount" jdbcType="VARCHAR"/>
+		<result column="user_password" property="userPassword" jdbcType="VARCHAR"/>
+		<result column="user_name" property="userName" jdbcType="VARCHAR"/>
+		<result column="user_remarks" property="userRemarks" jdbcType="VARCHAR"/>
+		<result column="role_id" property="roleId" jdbcType="INTEGER"/>
+		<result column="create_by" property="createBy" jdbcType="INTEGER"/>
+		<result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+		<result column="update_by" property="updateBy" jdbcType="INTEGER"/>
+		<result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+	</resultMap>
+
+	<resultMap id="user_result_loginMap" type="com.company.entity.LoginUser" >
+		<id column="user_id" property="userId" jdbcType="INTEGER"/>
+		<result column="user_account" property="userAccount" jdbcType="VARCHAR"/>
+		<result column="user_password" property="userPassword" jdbcType="VARCHAR"/>
+		<result column="user_name" property="userName" jdbcType="VARCHAR"/>
+		<result column="user_remarks" property="userRemarks" jdbcType="VARCHAR"/>
+		<result column="role_id" property="roleId" jdbcType="INTEGER"/>
+	</resultMap>
+
+
+	<insert id="insertByEntity" parameterType="com.company.entity.User">
+		insert into t_user
+		<trim prefix="(" suffix=")" suffixOverrides="," >
+			<if test="userId!=null and userId!=''">
+				user_id,
+			</if>
+			<if test="userAccount!=null and userAccount!=''">
+				user_account,
+			</if>
+			<if test="userPassword!=null and userPassword!=''">
+				user_password,
+			</if>
+			<if test="userName!=null and userName!=''">
+				user_name,
+			</if>
+			<if test="userRemarks!=null and userRemarks!=''">
+				user_remarks,
+			</if>
+			<if test="roleId!=null and roleId!=''">
+				role_id,
+			</if>
+			<if test="createBy!=null and createBy!=''">
+				create_by,
+			</if>
+			<if test="createTime!=null and createTime!=''">
+				create_time,
+			</if>
+			<if test="updateBy!=null and updateBy!=''">
+				update_by,
+			</if>
+			<if test="updateTime!=null and updateTime!=''">
+				update_time,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides="," >
+			<if test="userId!=null and userId!=''">
+				#{userId,jdbcType=INTEGER},
+			</if>
+			<if test="userAccount!=null and userAccount!=''">
+				#{userAccount,jdbcType=VARCHAR},
+			</if>
+			<if test="userPassword!=null and userPassword!=''">
+				#{userPassword,jdbcType=VARCHAR},
+			</if>
+			<if test="userName!=null and userName!=''">
+				#{userName,jdbcType=VARCHAR},
+			</if>
+			<if test="userRemarks!=null and userRemarks!=''">
+				#{userRemarks,jdbcType=VARCHAR},
+			</if>
+			<if test="roleId!=null and roleId!=''">
+				#{roleId,jdbcType=INTEGER},
+			</if>
+			<if test="createBy!=null and createBy!=''">
+				#{createBy,jdbcType=INTEGER},
+			</if>
+			<if test="createTime!=null and createTime!=''">
+				#{createTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="updateBy!=null and updateBy!=''">
+				#{updateBy,jdbcType=INTEGER},
+			</if>
+			<if test="updateTime!=null and updateTime!=''">
+				#{updateTime,jdbcType=TIMESTAMP},
+			</if>
+		</trim>
+	</insert>
+	
+	<delete id="delete">
+		delete from t_user
+		<where>
+			AND user_id IN
+			<foreach collection="userIds" index="index" item="userId" open="("
+					 separator="," close=")">
+				#{userId,jdbcType=INTEGER}
+			</foreach>
+		</where>
+	</delete>
+
+	<update id="updateByEntity">
+		update t_user
+		<set>
+			<if test="userAccount!=null and userAccount!=''">
+				user_account=#{userAccount,jdbcType=VARCHAR},
+			</if>
+			<if test="userPassword!=null and userPassword!=''">
+				user_password=#{userPassword,jdbcType=VARCHAR},
+			</if>
+			<if test="userName!=null and userName!=''">
+				user_name=#{userName,jdbcType=VARCHAR},
+			</if>
+			<if test="userRemarks!=null and userRemarks!=''">
+				user_remarks=#{userRemarks,jdbcType=VARCHAR},
+			</if>
+			<if test="roleId!=null and roleId!=''">
+				role_id=#{roleId,jdbcType=INTEGER},
+			</if>
+			<if test="createBy!=null and createBy!=''">
+				create_by=#{createBy,jdbcType=INTEGER},
+			</if>
+			<if test="createTime!=null and createTime!=''">
+				create_time=#{createTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="updateBy!=null and updateBy!=''">
+				update_by=#{updateBy,jdbcType=INTEGER},
+			</if>
+			<if test="updateTime!=null and updateTime!=''">
+				update_time=#{updateTime,jdbcType=TIMESTAMP},
+			</if>
+		</set>
+		<where>
+			<if test="userId!=null and userId!=''">
+				and user_id=#{userId,jdbcType=INTEGER}
+			</if>
+		</where>
+	</update>
+
+	<select id="selectSingle" resultMap="user_result_loginMap">
+		select user_id,user_account,user_password,user_name,user_remarks,role_id from t_user
+		<where>
+			<if test="userAccount!=null and userAccount!=''">
+				and user_account = #{userAccount,jdbcType=VARCHAR}
+			</if>
+			<if test="userPassword!=null and userPassword!=''">
+				and user_password = #{userPassword,jdbcType=VARCHAR}
+			</if>
+		</where>
+	</select>
+
+	<select id="queryByObject" resultType="hashMap" >
+		SELECT user_id,user_account,user_password,user_name,user_remarks,t_user.role_id,role_name,(select user_name from t_user where user_id = t_user.create_by) AS createName,t_user.create_time,t_user.update_by,t_user.update_time FROM t_user
+		LEFT JOIN t_role on t_role.role_id = t_user.role_id
+		<where>
+			<if test="userId!=null and userId!=''">
+				and user_id  = #{userId,jdbcType=INTEGER}
+			</if>
+			<if test="userAccount!=null and userAccount!=''">
+				and user_account = #{userAccount,jdbcType=VARCHAR}
+			</if>
+			<if test="userPassword!=null and userPassword!=''">
+				and user_password = #{userPassword,jdbcType=VARCHAR}
+			</if>
+			<if test="userName!=null and userName!=''">
+				and user_name = #{userName,jdbcType=VARCHAR}
+			</if>
+			<if test="userRemarks!=null and userRemarks!=''">
+				and user_remarks = #{userRemarks,jdbcType=VARCHAR}
+			</if>
+			<if test="roleId!=null and roleId!=''">
+				and t_user.role_id = #{roleId,jdbcType=INTEGER}
+			</if>
+			<if test="createBy!=null and createBy!=''">
+				and t_user.create_by = #{createBy,jdbcType=INTEGER}
+			</if>
+			<if test="createTimeBegin!=null and createTimeBegin!=''">
+				and t_user.create_time <![CDATA[ >= ]]> str_to_date(#{createTimeBegin},  '%Y-%m-%d %H:%i:%s')
+			</if>
+			<if test="createTimeEnd!=null and createTimeEnd!=''">
+				and t_user.create_time <![CDATA[ <= ]]> str_to_date(#{createTimeEnd},  '%Y-%m-%d %H:%i:%s')
+			</if>
+			<if test="updateBy!=null and updateBy!=''">
+				and t_user.update_by = #{updateBy,jdbcType=INTEGER}
+			</if>
+			<if test="updateTimeBegin!=null and updateTimeBegin!=''">
+				and t_user.update_time <![CDATA[ >= ]]> str_to_date(#{updateTimeBegin},  '%Y-%m-%d %H:%i:%s')
+			</if>
+			<if test="updateTimeEnd!=null and updateTimeEnd!=''">
+				and t_user.update_time <![CDATA[ <= ]]> str_to_date(#{updateTimeEnd},  '%Y-%m-%d %H:%i:%s')
+			</if>
+		</where>
+	</select>
+
+	<select id="selectData" resultMap="user_result_map" >
+		SELECT user_id,user_account,user_password,user_name,user_remarks,role_id,create_by,create_time,update_by,update_time FROM t_user
+		<where>
+			<if test="userAccount!=null and userAccount!=''">
+				and user_account = #{userAccount,jdbcType=VARCHAR}
+			</if>
+			<if test="userId!=null and userId!=''">
+				and user_id != #{userId,jdbcType=INTEGER}
+			</if>
+		</where>
+	</select>
+
+	<select id="getUserInfo" resultType="hashMap" >
+		SELECT user_id,user_name,user_remarks,t_user.role_id,role_name roleName FROM t_user
+		LEFT JOIN t_role ON t_role.role_id = t_user.role_id
+		WHERE user_id = #{userId}
+	</select>
+
+</mapper>

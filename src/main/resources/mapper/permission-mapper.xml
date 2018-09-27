@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    
+<mapper namespace="com.company.repository.PermissionMapper">
+
+	<resultMap id="permission_result_map" type="com.company.entity.Permission" >
+		<id column="permission_id" property="permissionId" jdbcType="INTEGER"/>
+		<result column="role_id" property="roleId" jdbcType="INTEGER"/>
+		<result column="menu_id" property="menuId" jdbcType="INTEGER"/>
+		<result column="permission_value" property="permissionValue" jdbcType="VARCHAR"/>
+		<result column="create_by" property="createBy" jdbcType="INTEGER"/>
+		<result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+		<result column="update_by" property="updateBy" jdbcType="INTEGER"/>
+		<result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+	</resultMap>
+
+	<insert id="insertByEntity">
+		insert into t_permission
+		<trim prefix="(" suffix=")" suffixOverrides="," >
+      		<if test="permissionId!=null and permissionId!=''">
+				permission_id,
+			</if>
+      		<if test="roleId!=null and roleId!=''">
+				role_id,
+			</if>
+      		<if test="menuId!=null and menuId!=''">
+				menu_id,
+			</if>
+      		<if test="permissionValue!=null and permissionValue!=''">
+				permission_value,
+			</if>
+      		<if test="createBy!=null and createBy!=''">
+				create_by,
+			</if>
+      		<if test="createTime!=null and createTime!=''">
+				create_time,
+			</if>
+      		<if test="updateBy!=null and updateBy!=''">
+				update_by,
+			</if>
+      		<if test="updateTime!=null and updateTime!=''">
+				update_time,
+			</if>
+    	</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides="," >
+			<if test="permissionId!=null and permissionId!=''">
+      			#{permissionId,jdbcType=INTEGER},
+			</if>
+      		<if test="roleId!=null and roleId!=''">
+      			#{roleId,jdbcType=INTEGER},
+			</if>
+      		<if test="menuId!=null and menuId!=''">
+      			#{menuId,jdbcType=INTEGER},
+			</if>
+      		<if test="permissionValue!=null and permissionValue!=''">
+      			#{permissionValue,jdbcType=VARCHAR},
+			</if>
+      		<if test="createBy!=null and createBy!=''">
+      			#{createBy,jdbcType=INTEGER},
+			</if>
+      		<if test="createTime!=null and createTime!=''">
+      			#{createTime,jdbcType=TIMESTAMP},
+			</if>
+      		<if test="updateBy!=null and updateBy!=''">
+      			#{updateBy,jdbcType=INTEGER},
+			</if>
+      		<if test="updateTime!=null and updateTime!=''">
+      			#{updateTime,jdbcType=TIMESTAMP},
+			</if>
+    	</trim>
+	</insert>
+
+<!--	<delete id="deleteByEntity">
+		delete from t_permission
+		<where>
+				<if test="permissionId!=null ">
+					and permission_id=#{permissionId,jdbcType=INTEGER}
+				</if>
+		</where>
+	</delete>-->
+
+	<update id="updateByEntity">
+		update t_permission
+		<set>
+			<if test="roleId!=null and roleId!=''">
+				role_id=#{roleId,jdbcType=INTEGER},
+			</if>
+			<if test="menuId!=null and menuId!=''">
+				menu_id=#{menuId,jdbcType=INTEGER},
+			</if>
+			<!--<if test="permissionValue!=null and permissionValue!=''">-->
+				permission_value=#{permissionValue,jdbcType=VARCHAR},
+			<!--</if>-->
+			<if test="createBy!=null and createBy!=''">
+				create_by=#{createBy,jdbcType=INTEGER},
+			</if>
+			<if test="createTime!=null and createTime!=''">
+				create_time=#{createTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="updateBy!=null and updateBy!=''">
+				update_by=#{updateBy,jdbcType=INTEGER},
+			</if>
+			<if test="updateTime!=null and updateTime!=''">
+				update_time=#{updateTime,jdbcType=TIMESTAMP},
+			</if>
+		</set>
+		<where>
+			<if test="permissionId!=null and permissionId!=''">
+				and permission_id=#{permissionId,jdbcType=INTEGER}
+			</if>
+		</where>
+	</update>
+
+
+	<select id="selectSingle" resultMap="permission_result_map">
+		select permission_id,role_id,menu_id,permission_value,create_by,create_time,update_by,update_time from t_permission
+		<where>
+			<if test="permissionId!=null ">
+				and permission_id=#{permissionId,jdbcType=INTEGER}
+			</if>
+		</where>
+	</select>
+
+	<select id="queryByObject" resultType="hashMap">
+		SELECT permission_id,role_id,menu_id,permission_value,create_by,create_time,update_by,update_time FROM t_permission
+		<where>
+			<if test="permissionId!=null and permissionId!=''">
+				and permission_id = #{permissionId,jdbcType=INTEGER}
+			</if>
+			<if test="roleId!=null and roleId!=''">
+				and role_id = #{roleId,jdbcType=INTEGER}
+			</if>
+			<if test="menuId!=null and menuId!=''">
+				and menu_id = #{menuId,jdbcType=INTEGER}
+			</if>
+			<if test="permissionValue!=null and permissionValue!=''">
+				and permission_value = #{permissionValue,jdbcType=VARCHAR}
+			</if>
+			<if test="createBy!=null and createBy!=''">
+				and create_by = #{createBy,jdbcType=INTEGER}
+			</if>
+			<if test="createTimeBegin!=null and createTimeBegin!=''">
+				and create_time <![CDATA[ >= ]]> str_to_date(#{createTimeBegin},  '%Y-%m-%d %H:%i:%s')
+			</if>
+			<if test="createTimeEnd!=null and createTimeEnd!=''">
+				and create_time <![CDATA[ <= ]]> str_to_date(#{createTimeEnd},  '%Y-%m-%d %H:%i:%s')
+			</if>
+			<if test="updateBy!=null and updateBy!=''">
+				and update_by= #{updateBy,jdbcType=INTEGER}
+			</if>
+			<if test="updateTimeBegin!=null and updateTimeBegin!=''">
+				and update_time <![CDATA[ >= ]]> str_to_date(#{updateTimeBegin},  '%Y-%m-%d %H:%i:%s')
+			</if>
+			<if test="updateTimeEnd!=null and updateTimeEnd!=''">
+				and update_time <![CDATA[ <= ]]> str_to_date(#{updateTimeEnd},  '%Y-%m-%d %H:%i:%s')
+			</if>
+		</where>
+			<if test="sortName!=null and sortName!=''">
+				ORDER BY ${sortName} ${sortOrder}
+			</if>
+	</select>
+
+	<select id="getPermission" resultType="hashMap">
+		SELECT permission_id,menu_name menuName,t_menu.menu_id,permission_value FROM t_menu
+		LEFT JOIN t_permission ON t_permission.menu_id = t_menu.menu_id
+		AND t_permission.role_id = #{roleId,jdbcType=INTEGER}
+		LEFT JOIN t_role ON t_role.role_id = t_permission.role_id
+		ORDER BY menu_id,menu_order
+	</select>
+
+<!--
+	<delete id="deletePermission">
+		delete from t_permission
+		WHERE role_id = #{roleId}
+		AND menu_id = #{menuId}
+	</delete>
+-->
+
+	<select id="getPermissionByMenuName" resultType="hashMap">
+		SELECT permission_id,permission_value FROM t_permission
+		JOIN t_menu ON t_permission.menu_id = t_menu.menu_id
+		WHERE t_permission.role_id = #{roleId}
+		AND menu_name = #{menuName}
+	</select>
+
+</mapper>

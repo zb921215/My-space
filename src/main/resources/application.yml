@@ -1,0 +1,64 @@
+spring:
+  profiles:
+    active: server
+  mvc:
+    view :
+     prefix: /
+     suffix: .html
+
+  datasource:
+    # 使用druid数据源
+    type: com.alibaba.druid.pool.DruidDataSource
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/test?characterEncoding=utf8&useSSL=false
+    username: root
+    password: 123456
+    filters: stat
+    maxActive: 20
+    initialSize: 1
+    maxWait: 60000
+    minIdle: 1
+    timeBetweenEvictionRunsMillis: 60000
+    minEvictableIdleTimeMillis: 300000
+    validationQuery: select 'x'
+    testWhileIdle: true
+    testOnBorrow: false
+    testOnReturn: false
+    poolPreparedStatements: true
+    maxOpenPreparedStatements: 20
+    #show-sql: true
+
+  #设置上传文件大小
+  http:
+    multipart:
+      maxFileSize: 10Mb
+      maxRequestSize: 10Mb
+
+  static-path-pattern: /**
+
+web.upload-path: D:/upload/
+
+spring.resources.static-locations: classpath:/META-INF/resources/,classpath:/resources/,classpath:/static/,classpath:/public/,file:${web.upload-path}
+
+
+#指向mapper的xml文件位置
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: com.company.entity
+  show-sql: true
+
+#pagehelper分页插件
+pagehelper:
+    helperDialect: mysql
+    reasonable: true
+    supportMethodsArguments: true
+    params: count=countSql
+
+logging:
+  level.com.company.repository: DEBUG
+  #file: demo.log
+  level.root: INFO
+
+
+
+

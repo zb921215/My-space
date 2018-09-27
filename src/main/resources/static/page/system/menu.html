@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="renderer" content="webkit">
+	<meta http-equiv="Cache-Control" content="no-siteapp" />
+	<meta http-equiv="Cache-Control" content="no-cache" />
+	<title>菜单管理</title>
+	<link href="../../asset/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+	<link href="../../asset/bootstrap-table/bootstrap-table.min.css" rel="stylesheet" />
+	<link href="../../asset/jquery-confirm/css/jquery-confirm.min.css" rel="stylesheet" />
+	<style>
+		.container-fluid{
+			margin-top:2%;
+		}
+	</style>
+</head>
+
+<body>
+
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-md-12">
+				<!-- 按钮触发模态框 -->
+				<div class="btn-group">
+					<button id="btn_add" type="button" class="btn btn-success">
+						<span class="glyphicon glyphicon-plus" aria-hidden="true"></span>新增
+					</button>
+					<button id="btn_edit" type="button" class="btn btn-warning">
+						<span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>修改
+					</button>
+					<button id="btn_delete" type="button" class="btn btn-danger">
+						<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>删除
+					</button>
+					<button id="btn_read" type="button" class="btn btn-info">
+						<span class="glyphicon glyphicon-zoom-in" aria-hidden="true"></span>查看
+					</button>
+				</div>
+				<table id="table"></table>
+			</div>
+		</div>
+	</div>
+
+	<!-- 按钮触发模态框 -->
+	<!-- 模态框（Modal） -->
+	<div class="modal fade" id="showModal" tabindex="-1" user="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true"> &times; </button>
+					<h4 class="modal-title" id="myModalLabel"></h4>
+				</div>
+				<div class="modal-body">
+					<form class="form-horizontal" user="form" id="menuForm">
+
+						<input type="hidden" class="form-control" name="menuId" id="menu_id"/>
+
+						<div class="form-group">
+							<label for="menu_name" class="col-sm-2 control-label">菜单名称</label>
+							<div class="col-sm-10">
+								<input type="text" class="form-control" name="menuName" id="menu_name" placeholder="请输入菜单名称" onblur="check()" />
+							</div>
+						</div>
+
+						<div class="form-group">
+							<label for="menu_url" class="col-sm-2 control-label">菜单链接</label>
+							<div class="col-sm-10">
+								<input type="text" class="form-control" name="menuUrl" id="menu_url" placeholder="请输入菜单链接" />
+							</div>
+						</div>
+
+						<div class="form-group">
+							<label for="menu_icon" class="col-sm-2 control-label">菜单图标</label>
+							<div class="col-sm-10">
+								<input type="text" class="form-control" name="menuIcon" id="menu_icon" placeholder="请输入菜单图标" />
+							</div>
+						</div>
+
+						<div class="form-group">
+							<label for="menu_pid" class="col-sm-2 control-label">上级菜单</label>
+							<div class="col-sm-10">
+								<select class="form-control" name="menuPid" id="menu_pid" onchange="refreshOrder(this.value)">
+								</select>
+							</div>
+						</div>
+
+						<div class="form-group">
+							<label for="menu_order" class="col-sm-2 control-label">菜单顺序</label>
+							<div class="col-sm-10">
+								<select class="form-control" name="menuOrder" id="menu_order">
+								</select>
+							</div>
+						</div>
+
+					</form>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">关闭 </button>
+					<button type="button" class="btn btn-primary" onclick="submit();" id="subButton">提交</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script src="../../asset/jquery/jquery-3.2.1.min.js"></script>
+	<!--权限控制-->
+	<script src="../../asset/js/control.js"></script>
+	<script src="../../asset/bootstrap/js/bootstrap.min.js"></script>
+	<script src="../../asset/bootstrap-table/bootstrap-table.min.js"></script>
+	<script src="../../asset/bootstrap-table/locale/bootstrap-table-zh-CN.js"></script>
+	<script src="../../asset/jquery-confirm/js/jquery-confirm.min.js"></script>
+	<script>
+		$("#showModal").on("hidden.bs.modal", function() {
+			/*$(this).removeData("bs.modal");*/
+			$("#showModal input").val('');
+		});
+
+		/*菜单唯一性校验*/
+		function check(){
+			if($("#menu_name").val()!=""){
+				$.ajax({
+					type : "get",
+					url : "../../Menu/selectData",
+					data : {"menuName":$("#menu_name").val(),"menuId":$("#menu_id").val()},
+					dataType : "json",
+					async : false,
+					success : function(result) {
+						if(result.data.length>0){
+							$.alert("该菜单名称已存在,请重新输入！");
+							$("#menu_name").val("");
+						}
+					}
+				});
+			}
+		}
+
+		function submit(){
+			if($("#menu_name").val().trim()==""){
+				$.alert("菜单名称不能为空！");
+				$("#menu_name").val('');
+				return;
+			}
+			if($("#menu_id").val()==""){
+				$.ajax({
+					type : "POST",
+					url : "../../Menu/addMenu",
+					data : $("#menuForm").serialize(),
+					dataType : "json",
+					async : false,
+					success : function(data) {
+						$("#showModal").modal('hide');
+						$.alert("添加成功！");
+						$table.bootstrapTable('refresh');
+					}
+				});
+			}else{
+				$.ajax({
+					type : "POST",
+					url : "../../Menu/updateMenu",
+					data : $("#menuForm").serialize(),
+					dataType : "json",
+					async : false,
+					success : function(data) {
+						$("#showModal").modal('hide');
+						$.alert("修改成功！");
+						$table.bootstrapTable('refresh');
+					}
+				});
+			}
+		}
+
+		$("#btn_add").on("click", function() {
+			$("#myModalLabel").html("添加菜单");
+			$("#menuForm").find('input,textarea,select').attr('disabled',false);
+			initSelect();//加载modal框中的下拉框。
+			$("#showModal").modal('show');
+			$("#subButton").show();
+		});
+
+		$("#btn_edit").on("click", function() {
+			var selectRows=$table.bootstrapTable('getAllSelections');
+			if(selectRows==null||selectRows.length==0){
+				$.alert("请勾选一条数据！");
+			}else if(selectRows.length>1){
+				$.alert("只能勾选一条数据！");
+			}else{
+				var row = selectRows[0];
+				$("#myModalLabel").html("查看菜单");
+				initSelect(row.menu_id,row.menu_pid);//加载modal框中的下拉框。
+				//给form表单赋值。
+				$("#menu_id").val(row.menu_id);
+				$("#menu_name").val(row.menu_name);
+				$("#menu_url").val(row.menu_url);
+				$("#menu_icon").val(row.menu_icon);
+				$("#menu_pid").val(row.menu_pid);
+				$("#menu_order").val(row.menu_order);
+				$("#menuForm").find('input,textarea,select').attr('disabled',false);
+				/*防止菜单结构被破坏，一级菜单不允许选择父级菜单*/
+				if(row.menu_pid==null){
+					$("#menu_pid").attr("disabled",true);
+
+				}
+				$("#showModal").modal('show');
+				$("#subButton").show();
+			}
+		});
+
+		$("#btn_read").on("click", function() {
+			var selectRows=$table.bootstrapTable('getAllSelections');
+			if(selectRows==null||selectRows.length==0){
+				$.alert("请勾选一条数据！");
+			}else if(selectRows.length>1){
+				$.alert("只能勾选一条数据！");
+			}else{
+				var row = selectRows[0];
+				$("#myModalLabel").html("查看菜单");
+				initSelect(row.menu_id,row.menu_pid);//加载modal框中的下拉框。
+				//给form表单赋值。
+				$("#menu_id").val(row.menu_id);
+				$("#menu_name").val(row.menu_name);
+				$("#menu_url").val(row.menu_url);
+				$("#menu_icon").val(row.menu_icon);
+				$("#menu_pid").val(row.menu_pid);
+				$("#menu_order").val(row.menu_order);
+				$("#menuForm").find('input,textarea,select').attr('disabled',true);
+				$("#showModal").modal('show');
+				$("#subButton").hide();
+			}
+		});
+
+		/*初始化modal框中的下拉框*/
+		function initSelect(menu_id,menu_pid){
+			$.ajax({
+				type : "get",
+				url : "../../Menu/selectData",
+				data : {"menu_id":menu_id},
+				dataType : "json",
+				async : false,
+				success : function(result) {
+					$("#menu_pid").html("<option value=''>请选择上级菜单<\/option>");
+					for(var i=0;i<result.data.length;i++){
+						$("#menu_pid").append('<option value="'+result.data[i].menu_id+'">'+result.data[i].menu_name+'</option>');
+					}
+				}
+			});
+			refreshOrder(menu_pid);//默认上级菜单为NULL
+		}
+
+		function refreshOrder(menuPid){
+			$.ajax({
+				type : "get",
+				url : "../../Menu/selectOrderByMenuPid",
+				data : {"menuPid":menuPid},
+				dataType : "json",
+				async : false,
+				success : function(result) {
+					$("#menu_order").html('');
+					$("#menu_order").append("<option value=''>默认顺延<\/option>");
+					for(var i=0;i<result.data.length;i++){
+						$("#menu_order").append('<option value="'+result.data[i].menu_order+'">'+result.data[i].menu_order+'</option>');
+					}
+				}
+			});
+		}
+
+		$("#btn_delete").on("click", function() {
+			var selectRows=$table.bootstrapTable('getAllSelections');
+			if(selectRows==null||selectRows.length==0) {
+				$.alert("请勾选要删除的记录！");
+				return;
+			}
+			var menuIds = "";
+			var i=0;
+			while(i<selectRows.length){
+				menuIds +=selectRows[i].menu_id;
+				if(i!=selectRows.length-1){
+					menuIds +=",";
+				}
+				i++;
+			}
+			$.confirm({
+				title: '删除!',
+				content: '是否确认删除?',
+				buttons: {
+					'确定': function () {
+						delByIds(menuIds);
+					},
+					'取消': function () {
+
+					}
+				}
+			});
+		});
+
+		function delByIds(menuIds){
+			$.ajax({
+				type : "post",
+				url : "../../Menu/delete",
+				data : {ids:menuIds},
+				dataType : "json",
+				async : false,
+				success : function(data) {
+					$.alert("删除成功!");
+					window.top.location.href = "../../asset/index.html";//删除以后首页菜单刷新。
+				}
+			});
+		}
+
+		/*加载表格*/
+		var $table = $("#table");
+		loadtable();
+		function loadtable(){
+			$table.bootstrapTable('destroy');
+			$table.bootstrapTable({
+				columns : [ {
+					field : 'state',
+					checkbox : true,
+					align : 'center',
+					valign : 'middle'
+				}, {
+					title: '序号',//标题  可不加
+                    align : 'center',
+                    valign : 'middle',
+					formatter: function (value, row, index) {
+						return index+1;
+					}
+				}, /*{
+					title : 'ID',
+					field : 'menu_id',
+					align : 'center',
+					valign : 'middle',
+					silentsort : true
+				}, */{
+					title : '菜单名称',
+					field : 'menu_name',
+					align : 'center',
+					valign : 'middle',
+					silentsort : true
+				}, {
+					title : '菜单链接',
+					field : 'menu_url',
+					align : 'center',
+					valign : 'middle',
+				}, {
+					title : '菜单图标',
+					field : 'menu_icon',
+					align : 'center',
+					valign : 'middle',
+					visible : true
+				}, {
+					title : '父级菜单',
+					field : 'parentMenuName',
+					align : 'center',
+					valign : 'middle',
+				},/* {
+					title : '排列序号',
+					field : 'menu_order',
+					align : 'center',
+					valign : 'middle',
+				}, */{
+					title : '创建人',
+					field : 'createName',
+					align : 'center',
+					valign : 'middle'
+				}, {
+					title : '创建时间',
+					field : 'create_time',
+					align : 'center',
+					valign : 'middle',
+					formatter:function(value){
+						return new Date(value).toLocaleString('chinese',{hour12:false}).replace(/\//g,"-");
+					}
+				}],
+				url : '../../Menu/query',
+				sidePagination : 'server',
+				idField : "menu_id",
+				contentType:"application/x-www-form-urlencoded; charset=UTF-8",
+				toolbar: '#toolbar',                       //工具按钮用哪个容器
+				striped: true,                            //是否显示行间隔色
+				cache: false,                              //是否使用缓存，默认为true，所以一般情况下需要设置一下这个属性（*）
+				pagination: true,                          //是否显示分页（*）
+				sortable: true,                           //是否启用排序
+				sortOrder: "asc",                          //排序方式
+				clickToSelect: true,						//点击行选中
+				method: 'GET',
+				height: 550,
+				pageNumber : 1,
+				pageSize : 10,
+				pageList : [10,20,50,100],
+				//search:false,客户端搜索
+				showFooter : false,
+				queryParamsType:'',/* queryParamsType的默认值为 'limit',在默认情况下传给服务端的参数为:offset,limit,sort设置为 ''  在这种情况下传给服务器的参数为：pageSize,pageNumber */
+				queryParams : function(params) {
+					var map = {
+						pageNumber: params.pageNumber,
+						pageSize: params.pageSize,
+						searchText:params.searchText,
+						sortName:params.sortName,
+						sortOrder:params.sortOrder
+					};
+					return map;
+				},
+			});
+		}
+	</script>
+</body>
+
+</html>
